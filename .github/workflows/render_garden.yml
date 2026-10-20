@@ -17,9 +17,9 @@ jobs:
         sudo apt-get install -y libxrender1 libxi6 libgconf-2-4 libfixposix4 libgl1
 
     - name: Set up Blender Environment
-      uses: up9cloud/action-setup-blender@v2.2
+      uses: bradyajohnston/setup-blender@v5
       with:
-        blender-version: '4.2.0' # Uses a stable Long Term Support (LTS) release
+        version: '4.2' # Installs stable Blender 4.2 LTS
 
     - name: Execute Procedural Render Engine
       run: |
