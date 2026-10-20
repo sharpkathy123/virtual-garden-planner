@@ -14,7 +14,7 @@ jobs:
     - name: Install System Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libxrender1 libxi6 libfixposix4 libgl1
+        sudo apt-get install -y libxrender1 libxi6 libfixposix4 libgl1 libegl1
 
     - name: Set up Blender Environment
       uses: bradyajohnston/setup-blender@v5
