@@ -1,0 +1,7 @@
+[
+  {"plant_name": "Carrots (Danvers Half Long)", "type": "Veggie", "germination_days": 10, "days_to_maturity": 75, "max_height_inches": 12, "spread_inches": 3, "blender_model_asset": "carrot_top_foliage"},
+  {"plant_name": "Kale (Lacinato)", "type": "Veggie", "germination_days": 7, "days_to_maturity": 60, "max_height_inches": 24, "spread_inches": 18, "blender_model_asset": "kale_ruffled_leaves"},
+  {"plant_name": "Radishes (Cherry Belle)", "type": "Veggie", "germination_days": 4, "days_to_maturity": 25, "max_height_inches": 6, "spread_inches": 4, "blender_model_asset": "radish_sprout"},
+  {"plant_name": "Calendula (Pot Marigold)", "type": "Flower", "germination_days": 10, "days_to_maturity": 50, "max_height_inches": 18, "spread_inches": 12, "blender_model_asset": "calendula_yellow_orange"},
+  {"plant_name": "Nasturtium", "type": "Flower", "germination_days": 12, "days_to_maturity": 60, "max_height_inches": 12, "spread_inches": 24, "blender_model_asset": "nasturtium_trailing"}
+]
