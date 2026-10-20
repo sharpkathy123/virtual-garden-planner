@@ -1,0 +1,33 @@
+name: Render Garden Video Animation
+
+on:
+  workflow_dispatch: # Allows you to manually trigger this from your iPad app or GitHub UI
+
+jobs:
+  render_video:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository Codebase
+      uses: actions/checkout@v4
+
+    - name: Install System Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libxrender1 libxi6 libgconf-2-4 libfixposix4 libgl1
+
+    - name: Set up Blender Environment
+      uses: up9cloud/action-setup-blender@v2.2
+      with:
+        blender-version: '4.2.0' # Uses a stable Long Term Support (LTS) release
+
+    - name: Execute Procedural Render Engine
+      run: |
+        blender --background --python render_pipeline.py
+
+    - name: Archive Rendered Time-lapse Video
+      uses: actions/upload-artifact@v4
+      with:
+        name: garden-growth-timelapse
+        path: garden_timelapse.mp4
+        retention-days: 7
