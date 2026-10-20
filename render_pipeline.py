@@ -3,14 +3,19 @@ import json
 import os
 
 def setup_scene():
-    """Wipes startup meshes and locks down flat viewport rendering properties."""
+    """Wipes startup meshes and locks down camera framing directly over the bed."""
     if "Cube" in bpy.data.objects:
         bpy.data.objects.remove(bpy.data.objects["Cube"], do_unlink=True)
         
     cam = bpy.data.objects.get("Camera")
     if cam:
-        cam.location = (0.0, 0.0, 8.0)
-        cam.rotation_euler = (0.0, 0.0, 0.0)
+        # Move camera slightly back and up, angling it downward at the center (0,0,0)
+        cam.location = (0.0, -5.0, 7.0)
+        cam.rotation_euler = (math.radians(35), 0.0, 0.0) # Angle down 35 degrees
+    
+    # Add a basic sun light so the flat shader has depth visible in headless mode
+    if "Light" in bpy.data.objects:
+        bpy.data.objects["Light"].location = (5.0, -5.0, 10.0)
 
 def build_garden_container(config):
     """Draws the wooden frame perimeter based on selected geometry specs."""
@@ -23,22 +28,26 @@ def build_garden_container(config):
         bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.1))
         box = bpy.context.active_object
         box.scale = (length, width, 0.2)
+        box.color = (0.35, 0.2, 0.1, 1.0) # Brown wood/soil color representation
         
     elif shape == "Circle":
         radius = dims.get("radius_ft", 3.0)
         bpy.ops.mesh.primitive_cylinder_add(radius=radius, depth=0.2, vertices=32, location=(0,0,0.1))
+        circle_bed = bpy.context.active_object
+        circle_bed.color = (0.35, 0.2, 0.1, 1.0)
 
 def generate_growth_sim(layout_data):
     """Generates basic geometric cylinders that scale upward over time."""
-    for idx, site in enumerate(layout_data):
+    for site in layout_data:
         coords = site.get("coordinates", {"x": 0.0, "y": 0.0})
         plant = site.get("plant", {})
         
         # Add basic cylinder sprout
-        bpy.ops.mesh.primitive_cylinder_add(radius=0.04, depth=1.0, location=(coords["x"], coords["y"], 0.0))
+        bpy.ops.mesh.primitive_cylinder_add(radius=0.06, depth=1.0, location=(coords["x"], coords["y"], 0.1))
         sprout = bpy.context.active_object
+        sprout.color = (0.1, 0.6, 0.2, 1.0) # Distinct plant green color
         
-        # Shift geometry mesh internally so the base sits perfectly at z=0 origin
+        # Adjust mesh origin to the bottom of the cylinder
         for vert in sprout.data.vertices:
             vert.co.z += 0.5
             
@@ -55,19 +64,17 @@ def generate_growth_sim(layout_data):
         sprout.keyframe_insert(data_path="scale", frame=mature_frame)
 
 def render_output_pipeline():
-    """Forces fast workbench rendering profile outputs."""
+    """Forces fast workbench rendering profile outputs with viewport shading colors active."""
     scene = bpy.context.scene
     scene.frame_start = 1
     scene.frame_end = 90
     
-    # CRITICAL SPEEDS FIX: Use workbench flat colors engine (takes milliseconds per frame)
     scene.render.engine = 'BLENDER_WORKBENCH'
-    scene.display.shading.light = 'FLAT'
-    scene.display.shading.color_type = 'OBJECT'
+    scene.display.shading.light = 'STUDIO' # Changed to studio light for visibility
+    scene.display.shading.color_type = 'OBJECT' # Ensures custom object colors show up
     
-    # Configure low resolution dimensions to speed up processing
-    scene.render.resolution_x = 640
-    scene.render.resolution_y = 640
+    scene.render.resolution_x = 800
+    scene.render.resolution_y = 600
     scene.render.resolution_percentage = 100
     
     scene.render.image_settings.file_format = 'FFMPEG'
@@ -75,10 +82,12 @@ def render_output_pipeline():
     scene.render.ffmpeg.codec = 'H264'
     scene.render.filepath = os.path.join(os.getcwd(), "garden_timelapse.mp4")
     
-    print("--- STARTING SPEED RENDER PIPELINE ---")
+    import math # Required for camera angles math translation
+    print("--- STARTING LIGHTNING VISUAL RENDER ---")
     bpy.ops.render.render(animation=True)
 
 if __name__ == "__main__":
+    import math
     setup_scene()
     
     default_config = {"garden_shape": "Rectangle", "dimensions": {"length_ft": 6.0, "width_ft": 4.0}}
